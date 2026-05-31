@@ -1,0 +1,22 @@
+{
+  "name": "numerology",
+  "private": true,
+  "version": "0.0.0",
+  "description": "AI 辅助的中国命理工具(八字四柱 + 紫微斗数):确定性排盘 + 结构化知识库 + AI 解读",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "tsc --build"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  }
+}

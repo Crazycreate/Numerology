@@ -1,0 +1,22 @@
+{
+  "name": "@numerology/knowledge",
+  "version": "0.0.0",
+  "description": "结构化命理知识库:调候用神 / 格局 / 十神 / 四化",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test"
+  },
+  "files": [
+    "dist",
+    "data"
+  ]
+}

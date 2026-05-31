@@ -1,0 +1,26 @@
+{
+  "name": "@numerology/engine",
+  "version": "0.0.0",
+  "description": "确定性排盘引擎:出生信息 → 八字四柱 + 紫微斗数 → 标准命盘 JSON",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@numerology/knowledge": "*",
+    "iztro": "^2.4.0",
+    "lunar-javascript": "^1.7.0"
+  }
+}

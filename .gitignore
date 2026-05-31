@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.next/
+out/
+*.log
+.env
+.env.local
+.DS_Store
+coverage/
+_legacy/
+.turbo/
+
+# 根目录散落的参考截图
+/*.png
+
+# 构建缓存 / 本地个人设置
+*.tsbuildinfo
+.claude/settings.local.json
+
+# 个人命盘导出件(pdf/html),勿入库
+/*.pdf
+/*.html

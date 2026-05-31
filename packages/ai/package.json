@@ -1,0 +1,26 @@
+{
+  "name": "@numerology/ai",
+  "version": "0.0.0",
+  "description": "AI 解读层:命盘 JSON → 上下文包 → Claude 报告/对话(带 prompt caching)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@numerology/engine": "*",
+    "@numerology/knowledge": "*"
+  }
+}
