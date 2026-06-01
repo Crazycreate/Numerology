@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
 import {
   isDizhi,
   isTiangan,
@@ -8,6 +5,7 @@ import {
   type Tiangan,
   type TiaohouTable,
 } from "./types.js";
+import QIONGTONG_TABLE from "./qiongtong.data.js";
 
 /**
  * 调候用神查询结果。
@@ -49,15 +47,10 @@ export function lookupTiaohou(
   };
 }
 
-let cached: TiaohouTable | null = null;
-
-/** Node 端加载调候表数据文件(浏览器/小程序应改为打包导入 JSON)。结果缓存。 */
+/**
+ * 加载调候表。数据已内联为 TS 模块(qiongtong.data.ts)随包打包,
+ * 故平台无关——Node、Vercel serverless、浏览器、小程序均可用,无运行时 fs 依赖。
+ */
 export function loadQiongtongTable(): TiaohouTable {
-  if (cached) return cached;
-  const here = dirname(fileURLToPath(import.meta.url));
-  // dist/qiongtong.js -> ../data/qiongtong.json(package 根下的 data/)
-  const dataPath = join(here, "..", "data", "qiongtong.json");
-  const raw = readFileSync(dataPath, "utf-8");
-  cached = JSON.parse(raw) as TiaohouTable;
-  return cached;
+  return QIONGTONG_TABLE;
 }
