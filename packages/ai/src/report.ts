@@ -83,8 +83,9 @@ export function streamFortuneReport(chart: ChartResult, opts: ReportOptions = {}
 }
 
 /**
- * 每节输出上限。压到约 1600 token,确保即便慢模型(~28 字/秒)单节也能在 60s 内跑完,
- * 从而绕开 Vercel 免费版 maxDuration=60 对整篇长报告的截断。
+ * 每节输出上限,设约 1600 token:既容得下单节自然篇幅(实测 ~1450 字,模型自然收尾、不触顶),
+ * 又确保慢模型(Opus 实测 ~30 字/秒 → 单节 ~48s)也能 <60s 跑完,绕开 Vercel maxDuration=60。
+ * 注:压得过低(如 1300)反而会把 Opus 的自然篇幅卡在半句——上限须高于自然篇幅,不可低于。
  */
 const SECTION_MAX_TOKENS = 1600;
 
