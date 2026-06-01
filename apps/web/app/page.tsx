@@ -14,6 +14,26 @@ import { SettingsPanel } from "@/components/SettingsPanel";
 
 type Mode = "known" | "infer";
 
+// 分段并行:key 对应引擎 REPORT_SEGMENTS / FORTUNE_SEGMENTS,各节 <60s 绕开 Vercel 函数上限。
+const REPORT_SEGS = [
+  { key: "personality", label: "性格特质" },
+  { key: "career", label: "事业方向" },
+  { key: "wealth", label: "财富特点" },
+  { key: "relationship", label: "感情婚姻" },
+  { key: "health", label: "健康提示" },
+  { key: "luck", label: "大运流年概览" },
+  { key: "advice", label: "总体建议 · 开运参考" },
+] as const;
+
+const FORTUNE_SEGS = [
+  { key: "overview", label: "一、当前总览" },
+  { key: "dayun", label: "二、大运逐步精讲" },
+  { key: "review", label: "三、回看校准" },
+  { key: "future", label: "四、未来流年走向" },
+  { key: "rhythm", label: "五、节奏与转折" },
+  { key: "action", label: "六、行动建议" },
+] as const;
+
 export default function Home() {
   const [mode, setMode] = useState<Mode>("known");
   const [input, setInput] = useState<BirthInput | null>(null);
@@ -102,15 +122,17 @@ export default function Home() {
               input={input}
               endpoint="/api/report"
               title="命盘格局解读"
-              description="整合八字与紫微、判定命宫三方四正格局,刻画性格 / 事业 / 财富 / 感情 / 健康(先天底色)。逐字呈现。"
+              description="整合八字与紫微、判定命宫三方四正格局,刻画性格 / 事业 / 财富 / 感情 / 健康(先天底色)。分节并行生成,逐节就位。"
               buttonLabel="生成格局解读"
+              segments={REPORT_SEGS}
             />
             <StreamedReport
               input={input}
               endpoint="/api/fortune"
               title="大运流年深析 · 八字 × 紫微合参"
-              description="专题深入分析「运」的走向——这是命理的精华:逐步大运 + 逐年流年,八字十神/引动用神与紫微大限/流年四化全程合参,给出到年份的节奏与建议。不限篇幅,详实优先。"
+              description="专题深入分析「运」的走向——这是命理的精华:逐步大运 + 逐年流年,八字十神/引动用神与紫微大限/流年四化全程合参,给出到年份的节奏与建议。分节并行生成,详实优先。"
               buttonLabel="生成大运流年深析"
+              segments={FORTUNE_SEGS}
             />
             <ChatPanel input={input} />
           </div>

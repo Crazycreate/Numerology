@@ -1,6 +1,13 @@
 import type { ChartResult, FortuneAnalysis } from "@numerology/engine";
 import { buildContextPack } from "./context.js";
-import { buildReportUserPrompt, buildFortuneReportPrompt } from "./prompts.js";
+import {
+  buildReportUserPrompt,
+  buildFortuneReportPrompt,
+  buildReportSectionPrompt,
+  buildFortuneSectionPrompt,
+  REPORT_SEGMENTS,
+  FORTUNE_SEGMENTS,
+} from "./prompts.js";
 import {
   MAX_TOKENS,
   buildCachedSystem,
@@ -72,5 +79,37 @@ export function streamFortuneReport(chart: ChartResult, opts: ReportOptions = {}
     maxTokens: opts.maxTokens ?? MAX_TOKENS.report,
     system: buildCachedSystem(chart, opts.fortune),
     messages: [{ role: "user", content: buildFortuneReportPrompt(caveats) }],
+  }, opts.ai);
+}
+
+/**
+ * 每节输出上限。压到约 1600 token,确保即便慢模型(~28 字/秒)单节也能在 60s 内跑完,
+ * 从而绕开 Vercel 免费版 maxDuration=60 对整篇长报告的截断。
+ */
+const SECTION_MAX_TOKENS = 1600;
+
+/** 《命盘格局解读》——单节流式(分段模式)。sectionKey ∈ REPORT_SEGMENTS[].key。 */
+export function streamReportSection(chart: ChartResult, sectionKey: string, opts: ReportOptions = {}) {
+  const seg = REPORT_SEGMENTS.find((s) => s.key === sectionKey);
+  if (!seg) throw new Error(`未知报告章节:${sectionKey}`);
+  const { caveats } = buildContextPack(chart, opts.fortune);
+  return chatStream({
+    kind: "report",
+    maxTokens: opts.maxTokens ?? SECTION_MAX_TOKENS,
+    system: buildCachedSystem(chart, opts.fortune),
+    messages: [{ role: "user", content: buildReportSectionPrompt(caveats, seg) }],
+  }, opts.ai);
+}
+
+/** 《大运流年深析》——单节流式(分段模式)。sectionKey ∈ FORTUNE_SEGMENTS[].key。 */
+export function streamFortuneSection(chart: ChartResult, sectionKey: string, opts: ReportOptions = {}) {
+  const seg = FORTUNE_SEGMENTS.find((s) => s.key === sectionKey);
+  if (!seg) throw new Error(`未知大运流年章节:${sectionKey}`);
+  const { caveats } = buildContextPack(chart, opts.fortune);
+  return chatStream({
+    kind: "report",
+    maxTokens: opts.maxTokens ?? SECTION_MAX_TOKENS,
+    system: buildCachedSystem(chart, opts.fortune),
+    messages: [{ role: "user", content: buildFortuneSectionPrompt(caveats, seg) }],
   }, opts.ai);
 }
