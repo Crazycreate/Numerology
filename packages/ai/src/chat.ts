@@ -1,5 +1,12 @@
 import type { ChartResult, FortuneAnalysis } from "@numerology/engine";
-import { MAX_TOKENS, buildCachedSystem, chatComplete, chatStream, type Usage } from "./client.js";
+import {
+  MAX_TOKENS,
+  buildCachedSystem,
+  chatComplete,
+  chatStream,
+  type Usage,
+  type ProviderOptions,
+} from "./client.js";
 
 export interface ChatTurn {
   role: "user" | "assistant";
@@ -15,6 +22,8 @@ export interface ChatOptions {
   /** 动态运势分析(与报告传同一份,保证口径一致) */
   fortune?: FortuneAnalysis;
   maxTokens?: number;
+  /** BYOK:用户自带 provider/key */
+  ai?: ProviderOptions;
 }
 
 /**
@@ -32,7 +41,7 @@ export async function answerFollowUp(
     maxTokens: opts.maxTokens ?? MAX_TOKENS.chat,
     system: buildCachedSystem(chart, opts.fortune),
     messages: [...history, { role: "user", content: question }],
-  });
+  }, opts.ai);
   return { text, usage };
 }
 
@@ -48,5 +57,5 @@ export function streamFollowUp(
     maxTokens: opts.maxTokens ?? MAX_TOKENS.chat,
     system: buildCachedSystem(chart, opts.fortune),
     messages: [...history, { role: "user", content: question }],
-  });
+  }, opts.ai);
 }

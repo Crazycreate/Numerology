@@ -10,6 +10,7 @@ import { BaziDetail } from "@/components/BaziDetail";
 import { StreamedReport } from "@/components/StreamedReport";
 import { ChatPanel } from "@/components/ChatPanel";
 import { TimeInferPanel } from "@/components/TimeInferPanel";
+import { SettingsPanel } from "@/components/SettingsPanel";
 
 type Mode = "known" | "infer";
 
@@ -65,6 +66,9 @@ export default function Home() {
       ) : (
         <BirthForm loading={loading} onSubmit={onSubmit} />
       )}
+
+      <SettingsPanel />
+
       {error ? <p className="notice" style={{ textAlign: "center" }}>{error}</p> : null}
 
       {mode === "known" && chart && input ? (

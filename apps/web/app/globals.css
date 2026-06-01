@@ -243,3 +243,31 @@ a { color: var(--cinnabar); }
 .cal-toggle .leap-check { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; color: var(--ink-soft); cursor: pointer; }
 
 .disclaimer { text-align: center; color: var(--ink-faint); font-size: 0.74rem; padding: 2rem 0 1rem; line-height: 1.6; }
+
+/* —— AI 设置(BYOK) —— */
+.settings { margin: 1rem 0; }
+.settings .fld { display: block; font-size: 0.82rem; color: var(--ink-soft); letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+.settings-toggle {
+  display: flex; align-items: center; gap: 0.5rem; width: 100%;
+  font: inherit; font-size: 0.9rem; color: var(--ink-soft);
+  background: transparent; border: 1px dashed var(--line-strong); border-radius: 12px;
+  padding: 0.6rem 1rem; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+}
+.settings-toggle:hover { border-color: var(--cinnabar-soft); color: var(--ink); }
+.settings-toggle .caret { margin-left: auto; color: var(--ink-faint); }
+.settings-body {
+  margin-top: 0.6rem; padding: 1.1rem 1.2rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+}
+.settings-select, .settings-input {
+  width: 100%; font: inherit; font-size: 1rem; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line-strong); border-radius: 10px;
+  padding: 0.55rem 0.8rem;
+}
+.settings-select:focus, .settings-input:focus {
+  outline: none; border-color: var(--cinnabar-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--cinnabar) 12%, transparent);
+}
+.settings-note { margin: 1rem 0 0; font-size: 0.8rem; line-height: 1.7; color: var(--ink-faint); }
+.settings-note b { color: var(--cinnabar); }
+.settings-body a { color: var(--cinnabar); }

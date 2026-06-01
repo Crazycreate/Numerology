@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import type { BirthInput } from "@numerology/engine";
 import { streamPost } from "@/lib/streamClient";
 import { printReport } from "@/lib/exportPdf";
+import { loadAi } from "@/lib/aiSettings";
 
 interface Props {
   input: BirthInput;
@@ -44,7 +45,7 @@ export function StreamedReport({ input, endpoint, title, description, buttonLabe
     setState("streaming");
     startedFor.current = key;
     try {
-      await streamPost(endpoint, { input }, (full) => setText(full));
+      await streamPost(endpoint, { input, ai: loadAi() }, (full) => setText(full));
       setState("done");
     } catch (e) {
       setError(e instanceof Error ? e.message : "生成失败");

@@ -3,6 +3,7 @@ import { streamFollowUp, type ChatTurn } from "@numerology/ai";
 import { parseBirthInput } from "@/lib/birth";
 import { ensureEnv } from "@/lib/env";
 import { streamToResponse } from "@/lib/stream";
+import { parseAi } from "@/lib/aiOpts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,6 +17,7 @@ export async function POST(req: Request): Promise<Response> {
       input?: unknown;
       history?: ChatTurn[];
       question?: unknown;
+      ai?: unknown;
     };
     const input = parseBirthInput(body.input);
     const question = typeof body.question === "string" ? body.question.trim() : "";
@@ -24,7 +26,7 @@ export async function POST(req: Request): Promise<Response> {
 
     const chart = castChart(input);
     const fortune = analyzeFortune(input, { yearsBack: 5, yearsAhead: 8 });
-    return streamToResponse(streamFollowUp(chart, history, question, { fortune }));
+    return streamToResponse(streamFollowUp(chart, history, question, { fortune, ai: parseAi(body) }));
   } catch (err) {
     const message = err instanceof Error ? err.message : "对话失败";
     return Response.json({ error: message }, { status: 400 });

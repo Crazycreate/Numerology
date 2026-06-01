@@ -3,6 +3,7 @@ import { streamReport } from "@numerology/ai";
 import { parseBirthInput } from "@/lib/birth";
 import { ensureEnv } from "@/lib/env";
 import { streamToResponse } from "@/lib/stream";
+import { parseAi } from "@/lib/aiOpts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,11 +13,11 @@ export const maxDuration = 60;
 export async function POST(req: Request): Promise<Response> {
   try {
     ensureEnv();
-    const body = (await req.json()) as { input?: unknown };
+    const body = (await req.json()) as { input?: unknown; ai?: unknown };
     const input = parseBirthInput(body.input);
     const chart = castChart(input);
     const fortune = analyzeFortune(input, { yearsBack: 5, yearsAhead: 8 });
-    return streamToResponse(streamReport(chart, { fortune }));
+    return streamToResponse(streamReport(chart, { fortune, ai: parseAi(body) }));
   } catch (err) {
     const message = err instanceof Error ? err.message : "报告生成失败";
     return Response.json({ error: message }, { status: 400 });

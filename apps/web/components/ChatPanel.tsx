@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { BirthInput } from "@numerology/engine";
 import { streamPost } from "@/lib/streamClient";
+import { loadAi } from "@/lib/aiSettings";
 
 interface Turn { role: "user" | "assistant"; content: string }
 
@@ -30,7 +31,7 @@ export function ChatPanel({ input }: { input: BirthInput }) {
     setLog((l) => [...l, { role: "user", content: q }, { role: "assistant", content: "" }]);
     setBusy(true);
     try {
-      await streamPost("/api/chat", { input, history, question: q }, (full) => {
+      await streamPost("/api/chat", { input, history, question: q, ai: loadAi() }, (full) => {
         setLog((l) => {
           const next = [...l];
           next[next.length - 1] = { role: "assistant", content: full };

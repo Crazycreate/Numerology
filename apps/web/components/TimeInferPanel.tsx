@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import type { HourCandidate } from "@numerology/engine";
 import type { BirthFormValue, Calendar } from "@/lib/formTypes";
 import { streamPost } from "@/lib/streamClient";
+import { loadAi } from "@/lib/aiSettings";
 import { LocationPicker } from "@/components/LocationPicker";
 
 interface Turn { role: "user" | "assistant"; content: string }
@@ -69,7 +70,7 @@ export function TimeInferPanel({ onAdopt }: { onAdopt: (input: BirthFormValue) =
     setLog([...display, { role: "assistant", content: "" }]);
     await streamPost(
       "/api/infer-time",
-      { input: inferInput(), history, message },
+      { input: inferInput(), history, message, ai: loadAi() },
       (full) => setLog((l) => {
         const next = [...l];
         next[next.length - 1] = { role: "assistant", content: full };

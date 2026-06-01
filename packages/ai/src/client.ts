@@ -14,6 +14,7 @@ export {
   type SystemBlock,
   type ChatMessage,
   type ModelKind,
+  type ProviderOptions,
 } from "./provider.js";
 
 /**

@@ -3,6 +3,7 @@ import { streamHourInference, type ChatTurn } from "@numerology/ai";
 import { parseHourInferInput } from "@/lib/birth";
 import { ensureEnv } from "@/lib/env";
 import { streamToResponse } from "@/lib/stream";
+import { parseAi } from "@/lib/aiOpts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,12 +13,17 @@ export const maxDuration = 60;
 export async function POST(req: Request): Promise<Response> {
   try {
     ensureEnv();
-    const body = (await req.json()) as { input?: unknown; history?: ChatTurn[]; message?: unknown };
+    const body = (await req.json()) as {
+      input?: unknown;
+      history?: ChatTurn[];
+      message?: unknown;
+      ai?: unknown;
+    };
     const input = parseHourInferInput(body.input);
     const message = typeof body.message === "string" ? body.message : "";
     const history = Array.isArray(body.history) ? body.history.slice(-16) : [];
     const candidates = castHourCandidates(input);
-    return streamToResponse(streamHourInference(candidates, history, message));
+    return streamToResponse(streamHourInference(candidates, history, message, { ai: parseAi(body) }));
   } catch (err) {
     const msg = err instanceof Error ? err.message : "时辰推断失败";
     return Response.json({ error: msg }, { status: 400 });

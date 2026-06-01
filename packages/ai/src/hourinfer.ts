@@ -1,5 +1,11 @@
 import type { HourCandidate } from "@numerology/engine";
-import { chatComplete, chatStream, type SystemBlock, type Usage } from "./client.js";
+import {
+  chatComplete,
+  chatStream,
+  type SystemBlock,
+  type Usage,
+  type ProviderOptions,
+} from "./client.js";
 import { HOUR_INFER_PERSONA } from "./prompts.js";
 import type { ChatTurn } from "./chat.js";
 
@@ -33,7 +39,7 @@ export function streamHourInference(
   cands: HourCandidate[],
   history: HourInferTurn[],
   message: string,
-  opts: { maxTokens?: number } = {},
+  opts: { maxTokens?: number; ai?: ProviderOptions } = {},
 ) {
   const userMsg = message.trim() || HOUR_INFER_OPENING;
   return chatStream({
@@ -41,7 +47,7 @@ export function streamHourInference(
     maxTokens: opts.maxTokens ?? HOUR_INFER_MAX_TOKENS,
     system: buildHourInferSystem(cands),
     messages: [...history, { role: "user", content: userMsg }],
-  });
+  }, opts.ai);
 }
 
 /** 非流式版本(测试/批处理用)。 */
