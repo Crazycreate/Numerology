@@ -92,9 +92,23 @@ export default function Home() {
       {error ? <p className="notice" style={{ textAlign: "center" }}>{error}</p> : null}
 
       {mode === "known" && chart && input ? (
-        <>
+        <div className="cross-flow">
+          {/* 汇流·并置带:八字 ⇄ 紫微,同源合参 */}
+          <div className="flow-systems">
+            <div className="sys sys-a">
+              <span className="sys-tag">八字</span>
+              <span className="sys-sub">四柱 · 先天干支</span>
+            </div>
+            <div className="flow-x" aria-hidden>⇄</div>
+            <div className="sys sys-b">
+              <span className="sys-tag">紫微</span>
+              <span className="sys-sub">星盘 · 十二宫</span>
+            </div>
+            <div className="flow-moment">同 一 出 生 时 刻 · 双 盘 合 参</div>
+          </div>
+
           <div className="card" style={{ marginTop: "var(--space)" }}>
-            <h2 className="section-title">紫微斗数 · 命盘</h2>
+            <h2 className="section-title"><span className="sys-chip is-b">紫微</span>斗数命盘 · 中宫纳四柱</h2>
             <ZiweiBoard
               ziwei={chart.ziwei}
               center={<BaziTable bazi={chart.bazi} ziwei={chart.ziwei} />}
@@ -117,7 +131,20 @@ export default function Home() {
             <BaziDetail bazi={chart.bazi} />
           </div>
 
-          <div style={{ marginTop: "var(--space)", display: "flex", flexDirection: "column", gap: "var(--space)" }}>
+          {/* 汇流箭头:两盘 → 合参解读 */}
+          <div className="flow-funnel" aria-hidden>
+            <span className="ff-a" />
+            <span className="ff-b" />
+          </div>
+
+          {/* 高潮:八字 × 紫微 合参解读 */}
+          <div className="synthesis">
+            <div className="synthesis-head">
+              <span className="dot" />
+              <h2>合参解读 · 八字 × 紫微</h2>
+              <span className="who">两套体系相互印证 · 分歧如实标注</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space)" }}>
             <StreamedReport
               input={input}
               endpoint="/api/report"
@@ -135,8 +162,9 @@ export default function Home() {
               segments={FORTUNE_SEGS}
             />
             <ChatPanel input={input} />
+            </div>
           </div>
-        </>
+        </div>
       ) : null}
 
       <p className="disclaimer">

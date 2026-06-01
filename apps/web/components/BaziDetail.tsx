@@ -26,7 +26,7 @@ export function BaziDetail({ bazi }: { bazi: BaziChart }) {
   const ps = COLS.map((c) => bazi.fourPillars[c.key]);
   return (
     <div className="card">
-      <h2 className="section-title">八字详盘</h2>
+      <h2 className="section-title"><span className="sys-chip is-a">八字</span>四柱详盘</h2>
       <div className="bazi-detail-wrap">
         <table className="bazi-detail">
           <thead>
