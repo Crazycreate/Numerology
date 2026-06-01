@@ -83,11 +83,12 @@ export function streamFortuneReport(chart: ChartResult, opts: ReportOptions = {}
 }
 
 /**
- * 每节输出上限,设约 1600 token:既容得下单节自然篇幅(实测 ~1450 字,模型自然收尾、不触顶),
- * 又确保慢模型(Opus 实测 ~30 字/秒 → 单节 ~48s)也能 <60s 跑完,绕开 Vercel maxDuration=60。
- * 注:压得过低(如 1300)反而会把 Opus 的自然篇幅卡在半句——上限须高于自然篇幅,不可低于。
+ * 每节输出上限,设约 1800 token —— 纯"安全网",须明显高于实际自然篇幅。
+ * 控篇幅靠 prompt 硬性字数(~900–1100 字);实测最慢的 Opus 即便如此仍会写到 ~1300–1400 字,
+ * 故上限留到 1800,使其自然篇幅(~1400 字)在撞顶前就以句号收尾,不被 max_tokens 切半句;
+ * 而 ~1400 字在 Opus ~32 字/秒下约 ~48s,仍稳在 Vercel 60s 内。上限须高于自然篇幅,切勿压到其下。
  */
-const SECTION_MAX_TOKENS = 1600;
+const SECTION_MAX_TOKENS = 1800;
 
 /** 《命盘格局解读》——单节流式(分段模式)。sectionKey ∈ REPORT_SEGMENTS[].key。 */
 export function streamReportSection(chart: ChartResult, sectionKey: string, opts: ReportOptions = {}) {

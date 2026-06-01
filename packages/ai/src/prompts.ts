@@ -173,6 +173,12 @@ function caveatBlockOf(caveats: string[]): string {
     : "";
 }
 
+/**
+ * 单节目标字数。设 900–1100 字:足够扎实,又让最慢模型(Opus ~31 字/秒)在 ~35s 内
+ * 自然写完、远低于 60s,且自然篇幅落在每节 token 上限之下,从根上避免"半句被切"。
+ */
+const SECTION_WORDS = "900–1100";
+
 /** 单节《命盘格局解读》指令(分段模式)。 */
 export function buildReportSectionPrompt(caveats: string[], seg: ReportSegment): string {
   return `请基于上方命盘事实,**只**写【命盘格局解读】中的这一节:「${seg.title}」。
@@ -180,7 +186,7 @@ export function buildReportSectionPrompt(caveats: string[], seg: ReportSegment):
 
 要求:
 - 【真实直接、不模棱两可】给出明确判断,优点缺点都直说,该断就断;少用"可能/也许/倾向于"安全垫,杜绝放之四海皆准、谁都适用的废话。真矛盾或数据有边界时明说"不确定/两种力量并存"。
-- 【详实但聚焦本节】把本节推理讲透(数段),论证充分;但不要越界写其它节,也不要把大运流年展开成长篇(那是另一份报告)。
+- 【篇幅·硬性】本节扼要讲透核心即可,约 ${SECTION_WORDS} 字、3–4 段;**务必在篇幅内把话说完、自然收尾(以句号结束),宁可少写一点,也绝不写到一半被切断。** 不要越界写其它节,也不要把大运流年展开成长篇(那是另一份报告)。
 - 每个论断挂依据(哪一柱/哪个十神/哪个宫位的哪颗星或四化)。若本节涉及性格/命格,务必结合「命宫三方四正」四宫合看主星定格局,先点格局再展开。
 - 八字与紫微相互印证或分歧都要体现。
 - **输出以「## ${seg.title}」作为小标题开头,只写这一节。**${caveatBlockOf(caveats)}`;
@@ -192,5 +198,6 @@ export function buildFortuneSectionPrompt(caveats: string[], seg: ReportSegment)
 本节要点:${seg.instruction}
 
 铁律:严格区分"命盘能给的领域与吉凶倾向(可肯定)"与"具体事件(不可编造)";流年以立春分界,年份按"倾向应期、可能±1 年"对待,别说得像精确到天。判断要直接敢断、不和稀泥。
+【篇幅·硬性】本节约 ${SECTION_WORDS} 字、扼要写透;**务必在篇幅内把话说完、自然收尾(以句号结束),宁短勿断,绝不写到一半被切。**
 **输出以「## ${seg.title}」作为小标题开头,只写这一节,不要写其它节。**${caveatBlockOf(caveats)}`;
 }
