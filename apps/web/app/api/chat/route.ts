@@ -6,7 +6,7 @@ import { streamToResponse } from "@/lib/stream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /** 流式对话追问(复用同一命盘 + 动态运势的缓存上下文)。 */
 export async function POST(req: Request): Promise<Response> {

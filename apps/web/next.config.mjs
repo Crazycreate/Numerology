@@ -10,6 +10,7 @@ const nextConfig = {
       "@numerology/knowledge",
       "iztro",
       "lunar-javascript",
+      "openai",
       "@anthropic-ai/sdk",
     ],
   },

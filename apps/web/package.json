@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build",
+    "build": "cd ../.. && npm run build -w @numerology/knowledge -w @numerology/engine -w @numerology/ai && cd apps/web && next build",
     "start": "next start -p 3000"
   },
   "dependencies": {

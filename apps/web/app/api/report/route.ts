@@ -6,7 +6,7 @@ import { streamToResponse } from "@/lib/stream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /** 流式生成命盘解读报告(动静结合)。 */
 export async function POST(req: Request): Promise<Response> {

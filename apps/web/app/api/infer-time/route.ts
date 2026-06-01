@@ -6,7 +6,7 @@ import { streamToResponse } from "@/lib/stream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /** 流式时辰推断对话:据已知人生事实比对 12 时辰命盘,反推最可能时辰。 */
 export async function POST(req: Request): Promise<Response> {

@@ -6,7 +6,7 @@ import { streamToResponse } from "@/lib/stream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /** 流式生成《大运流年深析》(八字 × 紫微合参,逐步逐年)。 */
 export async function POST(req: Request): Promise<Response> {
