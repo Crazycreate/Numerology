@@ -34,6 +34,20 @@ export type {
 const require = createRequire(import.meta.url);
 
 /**
+ * 读依赖版本,仅作元信息展示。
+ * 某些打包/运行环境(如 Vercel serverless)下,依赖 package.json 的子路径解析会被
+ * exports 字段拦截或未被 file-tracing 收录,直接 require 会抛错并连累整个排盘。
+ * 故包一层:取不到就降级为 "unknown",绝不影响确定性排盘本身。
+ */
+function depVersion(name: string): string {
+  try {
+    return (require(`${name}/package.json`) as { version?: string }).version ?? "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+/**
  * 一次排出同一出生信息的【八字 + 紫微】双盘,返回标准命盘 JSON。
  * 这是引擎对外的主入口。纯确定性,无网络、无 AI。
  */
@@ -46,8 +60,8 @@ export function castChart(input: BirthInput): ChartResult {
       trueSolarTimeApplied: correction.applied,
       correction,
       engine: {
-        iztro: require("iztro/package.json").version,
-        lunar: require("lunar-javascript/package.json").version,
+        iztro: depVersion("iztro"),
+        lunar: depVersion("lunar-javascript"),
       },
     },
     bazi: castBazi(input),
