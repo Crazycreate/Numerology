@@ -62,7 +62,7 @@ export function StreamedReport({ input, endpoint, title, description, buttonLabe
         </>
       ) : null}
 
-      {error ? <p className="notice">{error}(请确认服务端已配置 ANTHROPIC_API_KEY)</p> : null}
+      {error ? <p className="notice">{error}(请确认服务端已按 .env.example 配置好 AI provider 与对应 API key)</p> : null}
 
       {text ? (
         <div ref={proseRef} className={`prose ${state === "streaming" ? "cursor" : ""}`}>

@@ -25,7 +25,7 @@ An AI-assisted Chinese metaphysics tool combining **BaZi (Four Pillars of Destin
 ### Prerequisites
 
 - Node.js **≥ 18.17**
-- An [Anthropic API key](https://console.anthropic.com/) (for the AI layer; chart casting alone doesn't need it)
+- **The AI layer works out of the box with no key at all**: it defaults to the free, hosted [Pollinations](https://pollinations.ai/), so a fresh clone just runs (chart casting never needs a key). For better Chinese quality, switch to the free [Zhipu GLM-4-Flash](https://open.bigmodel.cn/) etc. See "Configuring the AI provider" below.
 
 ### Install & Run
 
@@ -37,17 +37,32 @@ cd Numerology
 # 2. Install dependencies (npm workspaces monorepo)
 npm install
 
-# 3. Configure the key
-cp .env.example .env
-# Edit .env and set ANTHROPIC_API_KEY=sk-ant-...
-
-# 4. Build core packages (engine + knowledge + AI)
+# 3. Build core packages (engine + knowledge + AI)
 npm run build -w @numerology/knowledge -w @numerology/engine -w @numerology/ai
 
-# 5. Start the web app
+# 4. Start the web app — defaults to Pollinations, no key needed for AI reports
 npm run dev -w @numerology/web
 # Open http://localhost:3000
+
+# (optional) switch to a better model: cp .env.example .env, then change AI_PROVIDER
 ```
+
+### Configuring the AI provider
+
+Chart casting is free and needs no key; only **AI interpretation / chat** goes through a provider. Pick one in `.env` via `AI_PROVIDER`:
+
+| provider | cost | key needed | Chinese quality | notes / sign up |
+|----------|------|-----------|-----------------|-----------------|
+| `pollinations` (default) | **free** | **no** | fair | works out of the box, hosted small model; anonymous tier is rate-limited and truncates output |
+| `ollama` | free | no | depends on model | runs locally, offline; install [Ollama](https://ollama.com/) then `ollama pull qwen2.5:32b` |
+| `glm` | free | yes | strong | recommended upgrade, direct in China: [open.bigmodel.cn](https://open.bigmodel.cn/) → `GLM_API_KEY` |
+| `gemini` | free tier | yes | good | [aistudio.google.com](https://aistudio.google.com/apikey) → `GEMINI_API_KEY` |
+| `groq` | free | yes | weaker, very fast | [console.groq.com](https://console.groq.com/keys) → `GROQ_API_KEY` |
+| `anthropic` | paid | yes | highest | [console.anthropic.com](https://console.anthropic.com/) → `ANTHROPIC_API_KEY` |
+| `custom` | depends | maybe | — | any OpenAI-compatible endpoint (OpenRouter / DeepSeek / local Ollama …): `AI_BASE_URL` + `AI_API_KEY` + `AI_MODEL_REPORT`/`AI_MODEL_CHAT` |
+
+Switching only changes `AI_PROVIDER` in `.env` — zero code changes. Use `AI_MODEL_REPORT` / `AI_MODEL_CHAT` to override default model names.
+> The default Pollinations uses a free small model — fair Chinese, possibly truncated output. **For full, accurate long-form readings, switch to the free `glm` (grab one key) or local `ollama`.**
 
 ### CLI demo (optional — verify casting + report)
 
@@ -68,7 +83,7 @@ npm test            # all workspace tests
 packages/
   knowledge/   @numerology/knowledge  Structured rules: climate-adjusting gods / patterns / Ten Gods / sihua (the moat)
   engine/      @numerology/engine     Pure TS: birth info → dual chart → standard chart JSON (no UI / no network)
-  ai/          @numerology/ai         Chart JSON + rules → context pack → Claude (report / chat / hour inference)
+  ai/          @numerology/ai         Chart JSON + rules → context pack → AI provider (report / chat / hour inference)
 apps/
   web/         @numerology/web        Next.js frontend
 ```
@@ -79,7 +94,7 @@ apps/
 
 - **Language/build**: TypeScript (strict), npm workspaces
 - **Casting libraries** (battle-tested, not hand-rolled): [`iztro`](https://github.com/SylarLong/iztro) (Zi Wei), [`lunar-javascript`](https://github.com/6tail/lunar-javascript) (BaZi / calendar)
-- **AI**: [`@anthropic-ai/sdk`](https://github.com/anthropics/anthropic-sdk-typescript) — Opus for reports, Sonnet for chat, with prompt caching
+- **AI**: pluggable providers (defaults to free GLM-4-Flash; also Gemini / Groq / Claude / any OpenAI-compatible endpoint). All but Claude go through the OpenAI-compatible protocol; the Claude path adds prompt caching
 - **Frontend**: Next.js 14 + React 18
 
 ## Knowledge Base

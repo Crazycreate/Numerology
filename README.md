@@ -25,7 +25,7 @@ AI 辅助的中国命理工具:**八字四柱 + 紫微斗数**。帮助人们了
 ### 前置要求
 
 - Node.js **≥ 18.17**
-- 一个 [Anthropic API Key](https://console.anthropic.com/)(用于 AI 解读层;仅排盘可不需要)
+- **AI 解读层默认开箱即用、无需任何 key**:默认连免费在线的 [Pollinations](https://pollinations.ai/),clone 完直接能跑(排盘本就不需要 key)。想要更好的中文质量,再切到免费的 [智谱 GLM-4-Flash](https://open.bigmodel.cn/) 等。详见下方「配置 AI provider」。
 
 ### 安装与运行
 
@@ -37,17 +37,32 @@ cd Numerology
 # 2. 安装依赖(npm workspaces 单仓)
 npm install
 
-# 3. 配置密钥
-cp .env.example .env
-# 编辑 .env,填入 ANTHROPIC_API_KEY=sk-ant-...
-
-# 4. 构建核心包(排盘 + 知识库 + AI 层)
+# 3. 构建核心包(排盘 + 知识库 + AI 层)
 npm run build -w @numerology/knowledge -w @numerology/engine -w @numerology/ai
 
-# 5. 启动 Web
+# 4. 启动 Web —— 默认 Pollinations,无需任何 key 即可出 AI 报告
 npm run dev -w @numerology/web
 # 打开 http://localhost:3000
+
+# (可选)想换更好的模型:cp .env.example .env,改 AI_PROVIDER 即可
 ```
+
+### 配置 AI provider
+
+排盘不花钱、不需要 key;只有 **AI 解读 / 对话**走 provider。在 `.env` 用 `AI_PROVIDER` 选一家:
+
+| provider | 费用 | 需要 key | 中文质量 | 说明 / 申请 |
+|----------|------|---------|---------|------------|
+| `pollinations`(默认) | **免费** | **否** | 一般 | 开箱即用、在线小模型;匿名层会限速、输出偏短 |
+| `ollama` | 免费 | 否 | 取决于模型 | 本地运行、不联网;需先装 [Ollama](https://ollama.com/) 并 `ollama pull qwen2.5:32b` |
+| `glm` | 免费 | 是 | 强 | 推荐升级项,国内直连:[open.bigmodel.cn](https://open.bigmodel.cn/) → `GLM_API_KEY` |
+| `gemini` | 免费额度 | 是 | 不错 | [aistudio.google.com](https://aistudio.google.com/apikey) → `GEMINI_API_KEY` |
+| `groq` | 免费 | 是 | 偏弱、极快 | [console.groq.com](https://console.groq.com/keys) → `GROQ_API_KEY` |
+| `anthropic` | 付费 | 是 | 最高 | [console.anthropic.com](https://console.anthropic.com/) → `ANTHROPIC_API_KEY` |
+| `custom` | 取决于端点 | 看情况 | — | 任意 OpenAI 兼容服务(OpenRouter / DeepSeek / 本地 Ollama 等):`AI_BASE_URL` + `AI_API_KEY` + `AI_MODEL_REPORT`/`AI_MODEL_CHAT` |
+
+切换只改 `.env` 的 `AI_PROVIDER`,代码零改动。可用 `AI_MODEL_REPORT` / `AI_MODEL_CHAT` 覆盖默认模型名。
+> 默认的 Pollinations 用的是免费小模型,中文质量一般、输出可能被截短;**想要完整、准确的长篇命理报告,建议切到免费的 `glm`(申请一把 key)或本地 `ollama`。**
 
 ### 命令行试跑(可选,验证排盘 + 报告)
 
@@ -68,7 +83,7 @@ npm test            # 全部 workspace 测试
 packages/
   knowledge/   @numerology/knowledge  结构化规则:调候用神 / 格局 / 十神 / 四化(护城河)
   engine/      @numerology/engine     纯 TS:出生信息 → 排双盘 → 标准命盘 JSON(无 UI / 无网络)
-  ai/          @numerology/ai         命盘 JSON + 规则 → 上下文包 → Claude(报告 / 对话 / 时辰推断)
+  ai/          @numerology/ai         命盘 JSON + 规则 → 上下文包 → AI provider(报告 / 对话 / 时辰推断)
 apps/
   web/         @numerology/web        Next.js 前端
 ```
@@ -79,7 +94,7 @@ apps/
 
 - **语言/构建**:TypeScript(strict)、npm workspaces
 - **排盘库**(成熟开源,不自研):[`iztro`](https://github.com/SylarLong/iztro)(紫微)、[`lunar-javascript`](https://github.com/6tail/lunar-javascript)(八字/历法)
-- **AI**:[`@anthropic-ai/sdk`](https://github.com/anthropics/anthropic-sdk-typescript),报告用 Opus、对话用 Sonnet,带 prompt caching
+- **AI**:多 provider 可切换(默认免费 GLM-4-Flash;另支持 Gemini / Groq / Claude / 任意 OpenAI 兼容端点)。除 Claude 外统一走 OpenAI 兼容协议;Claude 路径带 prompt caching
 - **前端**:Next.js 14 + React 18
 
 ## 知识库来源

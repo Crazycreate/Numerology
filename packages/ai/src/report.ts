@@ -1,7 +1,7 @@
 import type { ChartResult, FortuneAnalysis } from "@numerology/engine";
 import { buildContextPack } from "./context.js";
 import { buildReportUserPrompt, buildFortuneReportPrompt } from "./prompts.js";
-import { MAX_TOKENS, MODELS, buildCachedSystem, extractText, getClient, toUsage, type Usage } from "./client.js";
+import { MAX_TOKENS, buildCachedSystem, chatComplete, chatStream, type Usage } from "./client.js";
 
 export interface ReportResult {
   markdown: string;
@@ -14,53 +14,53 @@ export interface ReportOptions {
   maxTokens?: number;
 }
 
-/** 生成命盘解读报告(非流式)。需要 ANTHROPIC_API_KEY。 */
+/** 生成命盘解读报告(非流式)。需要当前 provider 的 API key。 */
 export async function generateReport(
   chart: ChartResult,
   opts: ReportOptions = {},
 ): Promise<ReportResult> {
   const { caveats } = buildContextPack(chart, opts.fortune);
-  const res = await getClient().messages.create({
-    model: MODELS.report,
-    max_tokens: opts.maxTokens ?? MAX_TOKENS.report,
+  const { text, usage } = await chatComplete({
+    kind: "report",
+    maxTokens: opts.maxTokens ?? MAX_TOKENS.report,
     system: buildCachedSystem(chart, opts.fortune),
     messages: [{ role: "user", content: buildReportUserPrompt(caveats) }],
   });
-  return { markdown: extractText(res.content), usage: toUsage(res.usage) };
+  return { markdown: text, usage };
 }
 
-/** 生成报告(流式),返回 SDK MessageStream,供 Web 端逐字渲染。 */
+/** 生成报告(流式),返回文本事件流,供 Web 端逐字渲染。 */
 export function streamReport(chart: ChartResult, opts: ReportOptions = {}) {
   const { caveats } = buildContextPack(chart, opts.fortune);
-  return getClient().messages.stream({
-    model: MODELS.report,
-    max_tokens: opts.maxTokens ?? MAX_TOKENS.report,
+  return chatStream({
+    kind: "report",
+    maxTokens: opts.maxTokens ?? MAX_TOKENS.report,
     system: buildCachedSystem(chart, opts.fortune),
     messages: [{ role: "user", content: buildReportUserPrompt(caveats) }],
   });
 }
 
-/** 《大运流年深析》(非流式):八字 × 紫微合参,逐步逐年。需要 ANTHROPIC_API_KEY。 */
+/** 《大运流年深析》(非流式):八字 × 紫微合参,逐步逐年。 */
 export async function generateFortuneReport(
   chart: ChartResult,
   opts: ReportOptions = {},
 ): Promise<ReportResult> {
   const { caveats } = buildContextPack(chart, opts.fortune);
-  const res = await getClient().messages.create({
-    model: MODELS.report,
-    max_tokens: opts.maxTokens ?? MAX_TOKENS.report,
+  const { text, usage } = await chatComplete({
+    kind: "report",
+    maxTokens: opts.maxTokens ?? MAX_TOKENS.report,
     system: buildCachedSystem(chart, opts.fortune),
     messages: [{ role: "user", content: buildFortuneReportPrompt(caveats) }],
   });
-  return { markdown: extractText(res.content), usage: toUsage(res.usage) };
+  return { markdown: text, usage };
 }
 
 /** 《大运流年深析》(流式)。 */
 export function streamFortuneReport(chart: ChartResult, opts: ReportOptions = {}) {
   const { caveats } = buildContextPack(chart, opts.fortune);
-  return getClient().messages.stream({
-    model: MODELS.report,
-    max_tokens: opts.maxTokens ?? MAX_TOKENS.report,
+  return chatStream({
+    kind: "report",
+    maxTokens: opts.maxTokens ?? MAX_TOKENS.report,
     system: buildCachedSystem(chart, opts.fortune),
     messages: [{ role: "user", content: buildFortuneReportPrompt(caveats) }],
   });

@@ -1,6 +1,5 @@
-import type Anthropic from "@anthropic-ai/sdk";
 import type { HourCandidate } from "@numerology/engine";
-import { MODELS, extractText, getClient, toUsage, type Usage } from "./client.js";
+import { chatComplete, chatStream, type SystemBlock, type Usage } from "./client.js";
 import { HOUR_INFER_PERSONA } from "./prompts.js";
 import type { ChatTurn } from "./chat.js";
 
@@ -16,19 +15,18 @@ function candidatesTable(cands: HourCandidate[]): string {
     .join("\n");
 }
 
-/** 时辰推断的缓存 system 块(人设 + 12 候选对照表)。 */
-export function buildHourInferSystem(cands: HourCandidate[]): Anthropic.TextBlockParam[] {
+/** 时辰推断的 system 块(人设 + 12 候选对照表);第二块标记 cache(仅 Anthropic 生效)。 */
+export function buildHourInferSystem(cands: HourCandidate[]): SystemBlock[] {
   return [
-    { type: "text", text: HOUR_INFER_PERSONA },
-    {
-      type: "text",
-      text: `## 该日 12 时辰候选命盘(用于比对反推)\n\n${candidatesTable(cands)}`,
-      cache_control: { type: "ephemeral" },
-    },
+    { text: HOUR_INFER_PERSONA },
+    { text: `## 该日 12 时辰候选命盘(用于比对反推)\n\n${candidatesTable(cands)}`, cache: true },
   ];
 }
 
 export interface HourInferTurn extends ChatTurn {}
+
+const HOUR_INFER_MAX_TOKENS = 3000;
+const HOUR_INFER_OPENING = "(开始)请简短说明原理,并向我提出第一轮用于区分时辰的问题。";
 
 /** 时辰推断对话(流式)。message 为空表示开场(模型应自我介绍并发起首轮提问)。 */
 export function streamHourInference(
@@ -37,10 +35,10 @@ export function streamHourInference(
   message: string,
   opts: { maxTokens?: number } = {},
 ) {
-  const userMsg = message.trim() || "(开始)请简短说明原理,并向我提出第一轮用于区分时辰的问题。";
-  return getClient().messages.stream({
-    model: MODELS.chat,
-    max_tokens: opts.maxTokens ?? 3000,
+  const userMsg = message.trim() || HOUR_INFER_OPENING;
+  return chatStream({
+    kind: "chat",
+    maxTokens: opts.maxTokens ?? HOUR_INFER_MAX_TOKENS,
     system: buildHourInferSystem(cands),
     messages: [...history, { role: "user", content: userMsg }],
   });
@@ -53,12 +51,12 @@ export async function inferHour(
   message: string,
   opts: { maxTokens?: number } = {},
 ): Promise<{ text: string; usage: Usage }> {
-  const userMsg = message.trim() || "(开始)请简短说明原理,并向我提出第一轮用于区分时辰的问题。";
-  const res = await getClient().messages.create({
-    model: MODELS.chat,
-    max_tokens: opts.maxTokens ?? 3000,
+  const userMsg = message.trim() || HOUR_INFER_OPENING;
+  const { text, usage } = await chatComplete({
+    kind: "chat",
+    maxTokens: opts.maxTokens ?? HOUR_INFER_MAX_TOKENS,
     system: buildHourInferSystem(cands),
     messages: [...history, { role: "user", content: userMsg }],
   });
-  return { text: extractText(res.content), usage: toUsage(res.usage) };
+  return { text, usage };
 }

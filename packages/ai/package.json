@@ -1,7 +1,7 @@
 {
   "name": "@numerology/ai",
   "version": "0.0.0",
-  "description": "AI 解读层:命盘 JSON → 上下文包 → Claude 报告/对话(带 prompt caching)",
+  "description": "AI 解读层:命盘 JSON → 上下文包 → 多 provider 报告/对话(GLM/Gemini/Groq/Claude,可切换)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -21,6 +21,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@numerology/engine": "*",
-    "@numerology/knowledge": "*"
+    "@numerology/knowledge": "*",
+    "openai": "^4.77.0"
   }
 }
