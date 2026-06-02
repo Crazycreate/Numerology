@@ -2,6 +2,9 @@
 
 **[English](README.en.md) | [中文](README.md)**
 
+> 🔗 **Live demo (no install, free model by default):** https://numerology-web-nine.vercel.app/
+> Charts cast instantly; AI interpretation uses a free model by default — or paste your own API key under "⚙ AI 设置" to switch to a stronger model.
+
 An AI-assisted Chinese metaphysics tool combining **BaZi (Four Pillars of Destiny)** and **Zi Wei Dou Shu (Purple Star Astrology)**. It helps people understand their personality tendencies and life patterns — positioned as a **cultural & self-reflection tool, not fortune-telling determinism**.
 
 ## Core Design Principle
