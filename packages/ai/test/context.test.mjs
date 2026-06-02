@@ -14,10 +14,14 @@ test("上下文包含四柱、日主、调候、命宫等关键事实", () => {
   assert.ok(markdown.includes(chart.bazi.fourPillars.day.ganZhi), "日柱干支应出现在上下文");
 });
 
-test("未校正/未校对时产出对应 caveat", () => {
+test("未校正真太阳时产出 caveat", () => {
   const { caveats } = buildContextPack(chart);
   assert.ok(caveats.some((c) => c.includes("真太阳时")), "应提示真太阳时未校正");
-  assert.ok(caveats.some((c) => c.includes("调候")), "应提示调候数据待校对");
+});
+
+test("调候表已校对(reviewed),不再产出待校对 caveat", () => {
+  const { caveats } = buildContextPack(chart);
+  assert.ok(!caveats.some((c) => c.includes("调候")), "调候已校订,不应再有待校对提示");
 });
 
 test("大运过滤掉起运前的空步", () => {
