@@ -340,9 +340,23 @@ a { color: var(--cinnabar); }
   box-shadow: 0 12px 40px oklch(52% 0.18 32 / 0.1);
 }
 .synthesis::before {
-  content: "合 参"; position: absolute; top: 0.85rem; right: 1.15rem;
+  content: "解 读"; position: absolute; top: 0.85rem; right: 1.15rem;
   font-size: 0.66rem; letter-spacing: 0.4em; color: var(--cinnabar); opacity: 0.5; pointer-events: none;
 }
+
+/* 视角三选:八字 / 紫微 / 合参 */
+.lens-row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.9rem; }
+.lens-btn.is-bazi { background: var(--sys-a); }
+.lens-btn.is-ziwei { background: var(--cinnabar); }
+.lens-btn.is-both { background: var(--gold); color: var(--ink); }
+.btn.ghost.lens-active { border-color: var(--cinnabar); color: var(--cinnabar); font-weight: 600; }
+.lens-tag {
+  margin-left: 0.6rem; font-size: 0.7rem; letter-spacing: 0.08em; font-family: var(--serif);
+  color: var(--paper); padding: 0.1rem 0.5rem; border-radius: 999px; vertical-align: middle;
+}
+.lens-tag.is-bazi { background: var(--sys-a); }
+.lens-tag.is-ziwei { background: var(--cinnabar); }
+.lens-tag.is-both { background: var(--gold); color: var(--ink); }
 .synthesis-head { display: flex; align-items: center; gap: 0.7rem; margin-bottom: var(--space); }
 .synthesis-head .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cinnabar); box-shadow: 0 0 0 4px oklch(52% 0.18 32 / 0.15); }
 .synthesis-head h2 { margin: 0; font-size: 1.28rem; letter-spacing: 0.08em; }

@@ -137,27 +137,27 @@ export default function Home() {
             <span className="ff-b" />
           </div>
 
-          {/* 高潮:八字 × 紫微 合参解读 */}
+          {/* 解读:八字 / 紫微 / 合参,各自独立可选 */}
           <div className="synthesis">
             <div className="synthesis-head">
               <span className="dot" />
-              <h2>合参解读 · 八字 × 紫微</h2>
-              <span className="who">两套体系相互印证 · 分歧如实标注</span>
+              <h2>命理解读 · 八字 / 紫微 / 合参</h2>
+              <span className="who">可纯八字、纯紫微,或两者对照</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space)" }}>
             <StreamedReport
               input={input}
               endpoint="/api/report"
               title="命盘格局解读"
-              description="整合八字与紫微、判定命宫三方四正格局,刻画性格 / 事业 / 财富 / 感情 / 健康(先天底色)。分节并行生成,逐节就位。"
+              description="刻画性格 / 事业 / 财富 / 感情 / 健康(先天底色)。可选「八字」纯按十神格局调候、「紫微」纯按命宫三方四正星曜四化、或「合参」两者对照。分节并行生成,逐节就位。"
               buttonLabel="生成格局解读"
               segments={REPORT_SEGS}
             />
             <StreamedReport
               input={input}
               endpoint="/api/fortune"
-              title="大运流年深析 · 八字 × 紫微合参"
-              description="专题深入分析「运」的走向——这是命理的精华:逐步大运 + 逐年流年,八字十神/引动用神与紫微大限/流年四化全程合参,给出到年份的节奏与建议。分节并行生成,详实优先。"
+              title="大运流年深析"
+              description="专题分析「运」的走向(命理精华):逐步大运 + 逐年流年的节奏与建议。可选「八字」(大运流年十神/引动用神)、「紫微」(大限流年四化飞宫)、或「合参」对照。分节并行生成,详实优先。"
               buttonLabel="生成大运流年深析"
               segments={FORTUNE_SEGS}
             />

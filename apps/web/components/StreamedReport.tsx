@@ -14,6 +14,14 @@ export interface ReportSeg {
   label: string;
 }
 
+/** 解读视角:纯八字 / 纯紫微 / 合参。 */
+type Lens = "bazi" | "ziwei" | "both";
+const LENSES: { key: Lens; label: string; tag: string }[] = [
+  { key: "bazi", label: "按八字", tag: "八字" },
+  { key: "ziwei", label: "按紫微", tag: "紫微" },
+  { key: "both", label: "合参", tag: "合参" },
+];
+
 interface Props {
   input: BirthInput;
   endpoint: string;
@@ -26,21 +34,24 @@ interface Props {
 
 type State = "idle" | "streaming" | "done" | "error";
 
-/** 通用流式报告卡:点按钮 → 调指定 endpoint → 逐字渲染 Markdown。支持分段并行。 */
-export function StreamedReport({ input, endpoint, title, description, buttonLabel, segments }: Props) {
+/** 通用流式报告卡:选视角(八字/紫微/合参)→ 调指定 endpoint → 逐字渲染 Markdown。支持分段并行。 */
+export function StreamedReport({ input, endpoint, title, description, segments }: Props) {
   const [text, setText] = useState("");
   const [state, setState] = useState<State>("idle");
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [error, setError] = useState("");
+  const [lens, setLens] = useState<Lens>("both");
   const startedFor = useRef<string>("");
   const proseRef = useRef<HTMLDivElement>(null);
+
+  const lensTag = LENSES.find((l) => l.key === lens)?.tag ?? "合参";
 
   const exportPdf = () => {
     const html = proseRef.current?.innerHTML;
     if (!html) return;
     const d = input;
-    const meta = `${d.year}-${d.month}-${d.day} ${String(d.hour).padStart(2, "0")}:${String(d.minute ?? 0).padStart(2, "0")} ${d.gender}`;
-    printReport(title, html, meta);
+    const meta = `${d.year}-${d.month}-${d.day} ${String(d.hour).padStart(2, "0")}:${String(d.minute ?? 0).padStart(2, "0")} ${d.gender} · ${lensTag}`;
+    printReport(`${title} · ${lensTag}`, html, meta);
   };
 
   const key = JSON.stringify(input);
@@ -63,7 +74,7 @@ export function StreamedReport({ input, endpoint, title, description, buttonLabe
       })
       .join("\n\n");
 
-  const generateSegmented = async (segs: readonly ReportSeg[]) => {
+  const generateSegmented = async (segs: readonly ReportSeg[], useLens: Lens) => {
     setError("");
     setText("");
     setState("streaming");
@@ -77,7 +88,7 @@ export function StreamedReport({ input, endpoint, title, description, buttonLabe
 
     await Promise.all(
       segs.map((seg, i) =>
-        streamPost(endpoint, { input, ai, section: seg.key }, (full) => {
+        streamPost(endpoint, { input, ai, section: seg.key, lens: useLens }, (full) => {
           slots[i] = { ...slots[i], text: full };
           setText(combine(segs, slots));
         })
@@ -97,13 +108,13 @@ export function StreamedReport({ input, endpoint, title, description, buttonLabe
     setState("done");
   };
 
-  const generateSingle = async () => {
+  const generateSingle = async (useLens: Lens) => {
     setText("");
     setError("");
     setState("streaming");
     startedFor.current = key;
     try {
-      await streamPost(endpoint, { input, ai: loadAi() }, (full) => setText(full));
+      await streamPost(endpoint, { input, ai: loadAi(), lens: useLens }, (full) => setText(full));
       setState("done");
     } catch (e) {
       setError(e instanceof Error ? e.message : "生成失败");
@@ -111,15 +122,31 @@ export function StreamedReport({ input, endpoint, title, description, buttonLabe
     }
   };
 
-  const generate = () => (segments && segments.length ? generateSegmented(segments) : generateSingle());
+  const generate = (useLens: Lens) => {
+    setLens(useLens);
+    return segments && segments.length ? generateSegmented(segments, useLens) : generateSingle(useLens);
+  };
 
   return (
     <div className="card">
-      <h2 className="section-title">{title}</h2>
+      <h2 className="section-title">
+        {title}
+        {state !== "idle" ? <span className={`lens-tag is-${lens}`}>{lensTag}</span> : null}
+      </h2>
+
       {state === "idle" ? (
         <>
           <p className="muted" style={{ marginTop: 0 }}>{description}</p>
-          <button className="btn" onClick={generate}>{buttonLabel}</button>
+          <p className="muted" style={{ marginTop: "0.4rem" }}>
+            选一种视角生成:<strong>八字</strong>纯按八字法、<strong>紫微</strong>纯按紫微法、<strong>合参</strong>两者对照。
+          </p>
+          <div className="lens-row">
+            {LENSES.map((l) => (
+              <button key={l.key} className={`btn lens-btn is-${l.key}`} onClick={() => generate(l.key)}>
+                {l.label}
+              </button>
+            ))}
+          </div>
         </>
       ) : null}
 
@@ -140,8 +167,13 @@ export function StreamedReport({ input, endpoint, title, description, buttonLabe
       ) : null}
 
       {state === "done" || state === "error" ? (
-        <div style={{ marginTop: "1rem", display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
-          <button className="btn ghost" onClick={generate}>重新生成</button>
+        <div style={{ marginTop: "1rem", display: "flex", gap: "0.6rem", flexWrap: "wrap", alignItems: "center" }}>
+          <span className="muted" style={{ marginRight: "0.2rem" }}>换个视角重生成:</span>
+          {LENSES.map((l) => (
+            <button key={l.key} className={`btn ghost ${l.key === lens ? "lens-active" : ""}`} onClick={() => generate(l.key)}>
+              {l.label}
+            </button>
+          ))}
           {state === "done" ? (
             <button className="btn ghost" onClick={exportPdf}>导出 PDF</button>
           ) : null}

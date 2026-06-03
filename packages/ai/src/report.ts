@@ -7,6 +7,7 @@ import {
   buildFortuneSectionPrompt,
   REPORT_SEGMENTS,
   FORTUNE_SEGMENTS,
+  type ReportLens,
 } from "./prompts.js";
 import {
   MAX_TOKENS,
@@ -28,6 +29,8 @@ export interface ReportOptions {
   maxTokens?: number;
   /** BYOK:用户自带 provider/key */
   ai?: ProviderOptions;
+  /** 解读视角:纯八字 / 纯紫微 / 合参(默认合参)。仅分段流式接口生效。 */
+  lens?: ReportLens;
 }
 
 /** 生成命盘解读报告(非流式)。需要当前 provider 的 API key。 */
@@ -99,7 +102,7 @@ export function streamReportSection(chart: ChartResult, sectionKey: string, opts
     kind: "report",
     maxTokens: opts.maxTokens ?? SECTION_MAX_TOKENS,
     system: buildCachedSystem(chart, opts.fortune),
-    messages: [{ role: "user", content: buildReportSectionPrompt(caveats, seg) }],
+    messages: [{ role: "user", content: buildReportSectionPrompt(caveats, seg, opts.lens ?? "both") }],
   }, opts.ai);
 }
 
@@ -112,6 +115,6 @@ export function streamFortuneSection(chart: ChartResult, sectionKey: string, opt
     kind: "report",
     maxTokens: opts.maxTokens ?? SECTION_MAX_TOKENS,
     system: buildCachedSystem(chart, opts.fortune),
-    messages: [{ role: "user", content: buildFortuneSectionPrompt(caveats, seg) }],
+    messages: [{ role: "user", content: buildFortuneSectionPrompt(caveats, seg, opts.lens ?? "both") }],
   }, opts.ai);
 }
