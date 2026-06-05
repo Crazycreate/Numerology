@@ -31,7 +31,9 @@ export function buildHourInferSystem(cands: HourCandidate[]): SystemBlock[] {
 
 export interface HourInferTurn extends ChatTurn {}
 
-const HOUR_INFER_MAX_TOKENS = 3000;
+// 设 1800 token(安全网):时辰推断每轮以提问为主、本就简短,压到 1800 确保最慢模型单轮也 <60s,
+// 不被 Vercel maxDuration=60 截断(人设已要求每轮只问 3-5 个问题)。
+const HOUR_INFER_MAX_TOKENS = 1800;
 const HOUR_INFER_OPENING = "(开始)请简短说明原理,并向我提出第一轮用于区分时辰的问题。";
 
 /** 时辰推断对话(流式)。message 为空表示开场(模型应自我介绍并发起首轮提问)。 */
